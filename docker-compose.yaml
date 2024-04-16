@@ -1,0 +1,15 @@
+services:
+  passin-db:
+    container_name: passin-db
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=passin
+    volumes:
+      - passin-db:/var/lib/postgresql/data
+
+volumes:
+  passin-db:
