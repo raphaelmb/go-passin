@@ -1,4 +1,4 @@
-# pass.in
+# pass.in -- WIP
 
 Pass.in is an application for **managing participants in in-person events**.
 
