@@ -1,11 +1,14 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/raphaelmb/go-passin/internal/database/sqlc"
+	"github.com/raphaelmb/go-passin/internal/entity"
 )
 
 type EventRepository interface {
-	CreateEvent() error
+	CreateEvent(ctx context.Context, e *entity.Event) error
 }
 
 type repository struct {
@@ -18,6 +21,15 @@ func NewEventRepository(q *sqlc.Queries) EventRepository {
 	}
 }
 
-func (r *repository) CreateEvent() error {
+func (r *repository) CreateEvent(ctx context.Context, e *entity.Event) error {
+	err := r.queries.CreateEvent(ctx, sqlc.CreateEventParams{
+		Title:            e.Title,
+		Details:          e.Details,
+		Slug:             e.Slug,
+		MaximumAttendees: int32(e.MaximumAttendees),
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

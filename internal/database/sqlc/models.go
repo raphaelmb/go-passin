@@ -5,7 +5,6 @@
 package sqlc
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,10 +12,10 @@ import (
 
 type Event struct {
 	ID               uuid.UUID
-	Title            sql.NullString
-	Details          sql.NullString
-	Slug             sql.NullString
-	MaximumAttendees sql.NullInt32
+	Title            string
+	Details          string
+	Slug             string
+	MaximumAttendees int32
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }

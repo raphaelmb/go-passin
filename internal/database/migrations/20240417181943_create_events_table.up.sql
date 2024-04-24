@@ -2,10 +2,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    title VARCHAR(255),
-    details TEXT,
-    slug VARCHAR(200) UNIQUE,
-    maximum_attendees INTEGER,
+    title VARCHAR(255) NOT NULL,
+    details TEXT NOT NULL,
+    slug VARCHAR(200) UNIQUE NOT NULL,
+    maximum_attendees INTEGER NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );

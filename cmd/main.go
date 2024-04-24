@@ -1,8 +1,12 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"log/slog"
 	"net/http"
+	"os"
+
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/raphaelmb/go-passin/internal/database"
 	"github.com/raphaelmb/go-passin/internal/database/sqlc"
@@ -14,7 +18,7 @@ import (
 func main() {
 	db, err := database.NewDBConnection()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("error connecting to database", "err", err)
 	}
 	defer db.Close()
 
@@ -27,7 +31,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 
-	if err := http.ListenAndServe(":3333", mux); err != nil {
-		log.Fatal(err)
+	port := os.Getenv("PORT")
+	slog.Info(fmt.Sprintf("server running on port %s", port))
+	if err := http.ListenAndServe(port, mux); err != nil {
+		slog.Error("error starting server", "err", err)
 	}
 }

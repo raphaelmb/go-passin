@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createEvent = `-- name: CreateEvent :exec
@@ -15,10 +14,10 @@ INSERT INTO events(title, details, slug, maximum_attendees) VALUES($1, $2, $3, $
 `
 
 type CreateEventParams struct {
-	Title            sql.NullString
-	Details          sql.NullString
-	Slug             sql.NullString
-	MaximumAttendees sql.NullInt32
+	Title            string
+	Details          string
+	Slug             string
+	MaximumAttendees int32
 }
 
 func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error {

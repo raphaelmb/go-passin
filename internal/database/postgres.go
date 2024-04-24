@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"log/slog"
 	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -19,5 +20,6 @@ func NewDBConnection() (*sql.DB, error) {
 		db.Close()
 		return nil, err
 	}
+	slog.Info("connected to database")
 	return db, nil
 }

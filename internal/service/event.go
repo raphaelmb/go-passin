@@ -1,9 +1,16 @@
 package service
 
-import "github.com/raphaelmb/go-passin/internal/repository"
+import (
+	"context"
+	"log/slog"
+
+	"github.com/raphaelmb/go-passin/internal/entity"
+	"github.com/raphaelmb/go-passin/internal/handler/dto"
+	"github.com/raphaelmb/go-passin/internal/repository"
+)
 
 type EventService interface {
-	CreateEvent() error
+	CreateEvent(ctx context.Context, e dto.EventDTO) error
 }
 
 type service struct {
@@ -16,6 +23,17 @@ func NewEventService(repo repository.EventRepository) EventService {
 	}
 }
 
-func (s *service) CreateEvent() error {
+func (s *service) CreateEvent(ctx context.Context, e dto.EventDTO) error {
+	err := s.repo.CreateEvent(ctx, &entity.Event{
+		Title:            e.Title,
+		Details:          e.Details,
+		Slug:             e.Slug,
+		MaximumAttendees: e.MaximumAttendees,
+	})
+	if err != nil {
+		slog.Error("error creating event", "err", err)
+		return err
+	}
+
 	return nil
 }
