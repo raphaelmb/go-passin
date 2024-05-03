@@ -7,6 +7,8 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createEvent = `-- name: CreateEvent :exec
@@ -28,4 +30,23 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 		arg.MaximumAttendees,
 	)
 	return err
+}
+
+const getEventByID = `-- name: GetEventByID :one
+SELECT id, title, details, slug, maximum_attendees, created_at, updated_at FROM events WHERE id = $1
+`
+
+func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error) {
+	row := q.db.QueryRowContext(ctx, getEventByID, id)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Details,
+		&i.Slug,
+		&i.MaximumAttendees,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

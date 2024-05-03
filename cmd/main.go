@@ -30,6 +30,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
+	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 
 	port := os.Getenv("PORT")
 	slog.Info(fmt.Sprintf("server running on port %s", port))

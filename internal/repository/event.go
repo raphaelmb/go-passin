@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/raphaelmb/go-passin/internal/database/sqlc"
 	"github.com/raphaelmb/go-passin/internal/entity"
 )
 
 type EventRepository interface {
 	CreateEvent(ctx context.Context, e *entity.Event) error
+	GetEventByID(ctx context.Context, id uuid.UUID) (*entity.Event, error)
 }
 
 type repository struct {
@@ -32,4 +34,20 @@ func (r *repository) CreateEvent(ctx context.Context, e *entity.Event) error {
 		return err
 	}
 	return nil
+}
+
+func (r *repository) GetEventByID(ctx context.Context, id uuid.UUID) (*entity.Event, error) {
+	event, err := r.queries.GetEventByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &entity.Event{
+		ID:               event.ID.String(),
+		Title:            event.Title,
+		Details:          event.Details,
+		Slug:             event.Slug,
+		MaximumAttendees: int(event.MaximumAttendees),
+		CreatedAt:        event.CreatedAt,
+		UpdatedAt:        event.UpdatedAt,
+	}, nil
 }
