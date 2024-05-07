@@ -63,6 +63,8 @@ func (h *handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(msg)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
