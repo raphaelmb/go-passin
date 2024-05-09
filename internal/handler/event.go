@@ -59,7 +59,7 @@ func (h *handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("error to create event", "err", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewInternalServerError("error decoding body")
+		msg := httperr.NewInternalServerError(err.Error())
 		json.NewEncoder(w).Encode(msg)
 		return
 	}

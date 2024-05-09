@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/gosimple/slug"
@@ -28,11 +29,19 @@ func NewEventService(repo repository.EventRepository) EventService {
 }
 
 func (s *service) CreateEvent(ctx context.Context, e dto.EventDTO) error {
-	sl := slug.Make(e.Title)
-	err := s.repo.CreateEvent(ctx, &entity.Event{
+	event, err := s.repo.GetEventBySlug(ctx, slug.Make(e.Title))
+	if err != nil {
+		return err
+	}
+
+	if event != nil {
+		return fmt.Errorf("another event with same slug already registered")
+	}
+
+	err = s.repo.CreateEvent(ctx, &entity.Event{
 		Title:            e.Title,
 		Details:          e.Details,
-		Slug:             sl,
+		Slug:             slug.Make(e.Title),
 		MaximumAttendees: e.MaximumAttendees,
 	})
 	if err != nil {

@@ -50,3 +50,22 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error)
 	)
 	return i, err
 }
+
+const getEventBySlug = `-- name: GetEventBySlug :one
+SELECT id, title, details, slug, maximum_attendees, created_at, updated_at FROM events WHERE slug = $1
+`
+
+func (q *Queries) GetEventBySlug(ctx context.Context, slug string) (Event, error) {
+	row := q.db.QueryRowContext(ctx, getEventBySlug, slug)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Details,
+		&i.Slug,
+		&i.MaximumAttendees,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
