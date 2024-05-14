@@ -24,13 +24,16 @@ func main() {
 
 	queries := sqlc.New(db)
 
+	attendeeRepo := repository.NewAttendeeRepository(queries)
+
 	eventRepo := repository.NewEventRepository(queries)
-	eventService := service.NewEventService(eventRepo)
+	eventService := service.NewEventService(eventRepo, attendeeRepo)
 	eventHandler := handler.NewEventHandler(eventService)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
+	mux.HandleFunc("POST /events/{id}/attendees", eventHandler.RegisterForEvent)
 
 	port := os.Getenv("PORT")
 	slog.Info(fmt.Sprintf("server running on port %s", port))

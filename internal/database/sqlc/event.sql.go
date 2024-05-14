@@ -69,3 +69,18 @@ func (q *Queries) GetEventBySlug(ctx context.Context, slug string) (Event, error
 	)
 	return i, err
 }
+
+const registerForEvent = `-- name: RegisterForEvent :exec
+INSERT INTO attendees(name, email, event_id) VALUES($1, $2, $3)
+`
+
+type RegisterForEventParams struct {
+	Name    string
+	Email   string
+	EventID uuid.UUID
+}
+
+func (q *Queries) RegisterForEvent(ctx context.Context, arg RegisterForEventParams) error {
+	_, err := q.db.ExecContext(ctx, registerForEvent, arg.Name, arg.Email, arg.EventID)
+	return err
+}
