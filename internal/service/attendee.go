@@ -2,15 +2,18 @@ package service
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/raphaelmb/go-passin/internal/handler/dto"
+	"github.com/raphaelmb/go-passin/internal/handler/httperr"
 	"github.com/raphaelmb/go-passin/internal/repository"
 )
 
 type AttendeeService interface {
 	GetAttendeeByEmail(ctx context.Context, email string, eventID uuid.UUID) (*dto.AttendeeResponseDTO, error)
 	CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (*int, error)
+	GetAttendeeBadge(ctx context.Context, id int) (*dto.AttendeeResponseDTO, error)
 }
 
 type AttendeeSvc struct {
@@ -41,4 +44,21 @@ func (s *AttendeeSvc) CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (
 		return nil, err
 	}
 	return amount, nil
+}
+
+func (s *AttendeeSvc) GetAttendeeBadge(ctx context.Context, id int) (*dto.AttendeeResponseDTO, error) {
+	attendee, err := s.repo.GetAttendeeBadge(ctx, id)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	if err == sql.ErrNoRows {
+		return nil, httperr.ErrAttendeeNotFound
+	}
+
+	return &dto.AttendeeResponseDTO{
+		Name:       attendee.Name,
+		Email:      attendee.Email,
+		EventTitle: attendee.EventTitle,
+	}, nil
 }

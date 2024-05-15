@@ -7,6 +7,7 @@ package sqlc
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -20,6 +21,38 @@ func (q *Queries) CountAttendeesByEvent(ctx context.Context, eventID uuid.UUID) 
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getAttendeeBadge = `-- name: GetAttendeeBadge :one
+SELECT a.id, a.name, a.email, a.created_at, a.updated_at, a.event_id, e.title FROM attendees a
+JOIN events e
+ON a.event_id = e.id
+WHERE a.id = $1
+`
+
+type GetAttendeeBadgeRow struct {
+	ID        int32
+	Name      string
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	EventID   uuid.UUID
+	Title     string
+}
+
+func (q *Queries) GetAttendeeBadge(ctx context.Context, id int32) (GetAttendeeBadgeRow, error) {
+	row := q.db.QueryRowContext(ctx, getAttendeeBadge, id)
+	var i GetAttendeeBadgeRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EventID,
+		&i.Title,
+	)
+	return i, err
 }
 
 const getAttendeeByEmail = `-- name: GetAttendeeByEmail :one

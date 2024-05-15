@@ -12,23 +12,23 @@ import (
 	"github.com/raphaelmb/go-passin/internal/service"
 )
 
-type EventHandler interface {
+type IEventHandler interface {
 	CreateEvent(w http.ResponseWriter, r *http.Request)
 	GetEventByID(w http.ResponseWriter, r *http.Request)
 	RegisterForEvent(w http.ResponseWriter, r *http.Request)
 }
 
-func NewEventHandler(service service.EventService) EventHandler {
-	return &handler{
+type EventHandler struct {
+	service service.EventService
+}
+
+func NewEventHandler(service service.EventService) IEventHandler {
+	return &EventHandler{
 		service: service,
 	}
 }
 
-type handler struct {
-	service service.EventService
-}
-
-func (h *handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
+func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	var req dto.EventDTO
 
 	if r.Body == http.NoBody {
@@ -74,7 +74,7 @@ func (h *handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
+func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	stringId := r.PathValue("id")
 	if stringId == "" {
 		slog.Error("id not provided")
@@ -114,7 +114,7 @@ func (h *handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(event)
 }
 
-func (h *handler) RegisterForEvent(w http.ResponseWriter, r *http.Request) {
+func (h *EventHandler) RegisterForEvent(w http.ResponseWriter, r *http.Request) {
 	var req dto.RegisterForEventDTO
 
 	if r.Body == http.NoBody {

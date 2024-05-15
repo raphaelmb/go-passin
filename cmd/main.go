@@ -27,6 +27,7 @@ func main() {
 	// attendees
 	attendeeRepo := repository.NewAttendeeRepository(queries)
 	attendeeSvc := service.NewAttendeeSvc(attendeeRepo)
+	attendeeHandler := handler.NewAttendeeHandler(attendeeSvc)
 
 	// events
 	eventRepo := repository.NewEventRepository(queries)
@@ -37,6 +38,7 @@ func main() {
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 	mux.HandleFunc("POST /events/{id}/attendees", eventHandler.RegisterForEvent)
+	mux.HandleFunc("GET /attendees/{id}/badge", attendeeHandler.GetAttendeeBadge)
 
 	port := os.Getenv("PORT")
 	slog.Info(fmt.Sprintf("server running on port %s", port))

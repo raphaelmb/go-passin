@@ -11,6 +11,7 @@ import (
 type AttendeeRepository interface {
 	GetAttendeeByEmail(ctx context.Context, email string, eventID uuid.UUID) (*entity.Attendee, error)
 	CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (*int, error)
+	GetAttendeeBadge(ctx context.Context, id int) (*entity.Attendee, error)
 }
 
 type AttendeeRepo struct {
@@ -43,4 +44,16 @@ func (r *AttendeeRepo) CountAttendeesByEvent(ctx context.Context, id uuid.UUID) 
 
 	result := int(num)
 	return &result, nil
+}
+
+func (r *AttendeeRepo) GetAttendeeBadge(ctx context.Context, id int) (*entity.Attendee, error) {
+	attendee, err := r.queries.GetAttendeeBadge(ctx, int32(id))
+	if err != nil {
+		return nil, err
+	}
+	return &entity.Attendee{
+		Name:       attendee.Name,
+		Email:      attendee.Email,
+		EventTitle: attendee.Title,
+	}, nil
 }
