@@ -10,4 +10,5 @@ type Event struct {
 	MaximumAttendees int
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+	Attendees        int
 }

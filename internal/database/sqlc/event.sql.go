@@ -7,6 +7,7 @@ package sqlc
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -33,12 +34,27 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 }
 
 const getEventByID = `-- name: GetEventByID :one
-SELECT id, title, details, slug, maximum_attendees, created_at, updated_at FROM events WHERE id = $1
+SELECT e.id, e.title, e.details, e.slug, e.maximum_attendees, e.created_at, e.updated_at, COUNT(a) as attendees FROM events e
+JOIN attendees a
+ON e.id = a.event_id
+WHERE e.id = $1
+GROUP BY e.id
 `
 
-func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error) {
+type GetEventByIDRow struct {
+	ID               uuid.UUID
+	Title            string
+	Details          string
+	Slug             string
+	MaximumAttendees int32
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	Attendees        int64
+}
+
+func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (GetEventByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getEventByID, id)
-	var i Event
+	var i GetEventByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -47,6 +63,7 @@ func (q *Queries) GetEventByID(ctx context.Context, id uuid.UUID) (Event, error)
 		&i.MaximumAttendees,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Attendees,
 	)
 	return i, err
 }

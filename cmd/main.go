@@ -24,10 +24,13 @@ func main() {
 
 	queries := sqlc.New(db)
 
+	// attendees
 	attendeeRepo := repository.NewAttendeeRepository(queries)
+	attendeeSvc := service.NewAttendeeSvc(attendeeRepo)
 
+	// events
 	eventRepo := repository.NewEventRepository(queries)
-	eventService := service.NewEventService(eventRepo, attendeeRepo)
+	eventService := service.NewEventService(eventRepo, attendeeSvc)
 	eventHandler := handler.NewEventHandler(eventService)
 
 	mux := http.NewServeMux()

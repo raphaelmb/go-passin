@@ -94,6 +94,13 @@ func (h *handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	event, err := h.service.GetEventByID(r.Context(), id)
+	if err == httperr.ErrEventNotFound {
+		slog.Error("error getting event with id: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		msg := httperr.NewNotFoundError(err.Error())
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
 	if err != nil {
 		slog.Error("error getting event with id: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)

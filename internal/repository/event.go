@@ -50,6 +50,7 @@ func (r *EventRepo) GetEventByID(ctx context.Context, id uuid.UUID) (*entity.Eve
 		Details:          event.Details,
 		Slug:             event.Slug,
 		MaximumAttendees: int(event.MaximumAttendees),
+		Attendees:        int(event.Attendees),
 		CreatedAt:        event.CreatedAt,
 		UpdatedAt:        event.UpdatedAt,
 	}, nil

@@ -21,14 +21,14 @@ type EventService interface {
 }
 
 type EventSvc struct {
-	EventRepo    repository.EventRepository
-	AttendeeRepo repository.AttendeeRepository
+	EventRepo   repository.EventRepository
+	AttendeeSvc AttendeeService
 }
 
-func NewEventService(eventRepo repository.EventRepository, attendeeRepo repository.AttendeeRepository) EventService {
+func NewEventService(eventRepo repository.EventRepository, attendeeSvc AttendeeService) EventService {
 	return &EventSvc{
-		EventRepo:    eventRepo,
-		AttendeeRepo: attendeeRepo,
+		EventRepo:   eventRepo,
+		AttendeeSvc: attendeeSvc,
 	}
 }
 
@@ -58,8 +58,12 @@ func (s *EventSvc) CreateEvent(ctx context.Context, e dto.EventDTO) error {
 
 func (s *EventSvc) GetEventByID(ctx context.Context, id uuid.UUID) (*dto.EventResponseDTO, error) {
 	event, err := s.EventRepo.GetEventByID(ctx, id)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
+	}
+
+	if err == sql.ErrNoRows {
+		return nil, httperr.ErrEventNotFound
 	}
 
 	return &dto.EventResponseDTO{
@@ -68,13 +72,12 @@ func (s *EventSvc) GetEventByID(ctx context.Context, id uuid.UUID) (*dto.EventRe
 		Details:          event.Details,
 		Slug:             event.Slug,
 		MaximumAttendees: event.MaximumAttendees,
-		CreatedAt:        event.CreatedAt,
-		UpdatedAt:        event.UpdatedAt,
+		AttendeesAmount:  event.Attendees,
 	}, nil
 }
 
 func (s *EventSvc) RegisterForEvent(ctx context.Context, e dto.RegisterForEventDTO, id uuid.UUID) error {
-	attendee, err := s.AttendeeRepo.GetAttendeeByEmail(ctx, e.Email, id)
+	attendee, err := s.AttendeeSvc.GetAttendeeByEmail(ctx, e.Email, id)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -88,7 +91,7 @@ func (s *EventSvc) RegisterForEvent(ctx context.Context, e dto.RegisterForEventD
 		return err
 	}
 
-	amountOfAttendeesForEvent, err := s.AttendeeRepo.CountAttendeesByEvent(ctx, id)
+	amountOfAttendeesForEvent, err := s.AttendeeSvc.CountAttendeesByEvent(ctx, id)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
