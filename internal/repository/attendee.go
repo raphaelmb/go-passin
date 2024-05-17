@@ -30,7 +30,7 @@ func (r *AttendeeRepo) GetAttendeeByEmail(ctx context.Context, email string, eve
 		return nil, err
 	}
 	return &entity.Attendee{
-		ID:    string(attendee.ID),
+		ID:    int(attendee.ID),
 		Email: attendee.Email,
 		Name:  attendee.Name,
 	}, nil
@@ -52,6 +52,7 @@ func (r *AttendeeRepo) GetAttendeeBadge(ctx context.Context, id int) (*entity.At
 		return nil, err
 	}
 	return &entity.Attendee{
+		ID:         int(attendee.ID),
 		Name:       attendee.Name,
 		Email:      attendee.Email,
 		EventTitle: attendee.Title,

@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/raphaelmb/go-passin/internal/handler/dto"
@@ -56,9 +59,21 @@ func (s *AttendeeSvc) GetAttendeeBadge(ctx context.Context, id int) (*dto.Attend
 		return nil, httperr.ErrAttendeeNotFound
 	}
 
+	checkInURL := getCheckInURL(ctx.Value("req").(*http.Request), strconv.Itoa(attendee.ID))
+
 	return &dto.AttendeeResponseDTO{
 		Name:       attendee.Name,
 		Email:      attendee.Email,
 		EventTitle: attendee.EventTitle,
+		CheckInURL: checkInURL,
 	}, nil
+}
+
+func getCheckInURL(r *http.Request, id string) string {
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	host := r.Host
+	return fmt.Sprintf("%s://%s/attendees/%s/check-in", scheme, host, id)
 }

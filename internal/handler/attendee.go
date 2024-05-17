@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -43,7 +44,9 @@ func (h *AttendeeHandler) GetAttendeeBadge(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	attendee, err := h.service.GetAttendeeBadge(r.Context(), id)
+	ctx := context.WithValue(r.Context(), "req", r)
+
+	attendee, err := h.service.GetAttendeeBadge(ctx, id)
 	if err == httperr.ErrAttendeeNotFound {
 		slog.Error("attendee with given id not found")
 		w.WriteHeader(http.StatusInternalServerError)
