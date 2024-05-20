@@ -35,6 +35,7 @@ func main() {
 	eventHandler := handler.NewEventHandler(eventService)
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", handler.GetHealth)
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 	mux.HandleFunc("POST /events/{id}/attendees", eventHandler.RegisterForEvent)
