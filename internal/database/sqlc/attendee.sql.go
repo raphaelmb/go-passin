@@ -23,6 +23,15 @@ func (q *Queries) CountAttendeesByEvent(ctx context.Context, eventID uuid.UUID) 
 	return count, err
 }
 
+const createCheckIn = `-- name: CreateCheckIn :exec
+INSERT INTO checkins(attendee_id) VALUES($1)
+`
+
+func (q *Queries) CreateCheckIn(ctx context.Context, attendeeID int32) error {
+	_, err := q.db.ExecContext(ctx, createCheckIn, attendeeID)
+	return err
+}
+
 const getAttendeeBadge = `-- name: GetAttendeeBadge :one
 SELECT a.id, a.name, a.email, a.created_at, a.updated_at, a.event_id, e.title FROM attendees a
 JOIN events e
@@ -75,5 +84,16 @@ func (q *Queries) GetAttendeeByEmail(ctx context.Context, arg GetAttendeeByEmail
 		&i.UpdatedAt,
 		&i.EventID,
 	)
+	return i, err
+}
+
+const getAttendeeByID = `-- name: GetAttendeeByID :one
+SELECT id, created_at, attendee_id From checkins WHERE attendee_id = $1
+`
+
+func (q *Queries) GetAttendeeByID(ctx context.Context, attendeeID int32) (Checkin, error) {
+	row := q.db.QueryRowContext(ctx, getAttendeeByID, attendeeID)
+	var i Checkin
+	err := row.Scan(&i.ID, &i.CreatedAt, &i.AttendeeID)
 	return i, err
 }

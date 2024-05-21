@@ -9,3 +9,9 @@ SELECT a.*, e.title FROM attendees a
 JOIN events e
 ON a.event_id = e.id
 WHERE a.id = $1;
+
+-- name: GetAttendeeByID :one
+SELECT * From checkins WHERE attendee_id = $1;
+
+-- name: CreateCheckIn :exec
+INSERT INTO checkins(attendee_id) VALUES($1);

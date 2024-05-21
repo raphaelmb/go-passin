@@ -12,6 +12,8 @@ type AttendeeRepository interface {
 	GetAttendeeByEmail(ctx context.Context, email string, eventID uuid.UUID) (*entity.Attendee, error)
 	CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (*int, error)
 	GetAttendeeBadge(ctx context.Context, id int) (*entity.Attendee, error)
+	GetCheckIn(ctx context.Context, id int) (*entity.CheckIn, error)
+	CreateCheckIn(ctx context.Context, id int) error
 }
 
 type AttendeeRepo struct {
@@ -57,4 +59,24 @@ func (r *AttendeeRepo) GetAttendeeBadge(ctx context.Context, id int) (*entity.At
 		Email:      attendee.Email,
 		EventTitle: attendee.Title,
 	}, nil
+}
+
+func (r *AttendeeRepo) GetCheckIn(ctx context.Context, id int) (*entity.CheckIn, error) {
+	attendeeCheckIn, err := r.queries.GetAttendeeByID(ctx, int32(id))
+	if err != nil {
+		return nil, err
+	}
+	return &entity.CheckIn{
+		ID:         int(attendeeCheckIn.ID),
+		CreatedAt:  attendeeCheckIn.CreatedAt,
+		AttendeeID: int(attendeeCheckIn.AttendeeID),
+	}, nil
+}
+
+func (r *AttendeeRepo) CreateCheckIn(ctx context.Context, id int) error {
+	err := r.queries.CreateCheckIn(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
 }

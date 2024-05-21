@@ -17,6 +17,7 @@ type AttendeeService interface {
 	GetAttendeeByEmail(ctx context.Context, email string, eventID uuid.UUID) (*dto.AttendeeResponseDTO, error)
 	CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (*int, error)
 	GetAttendeeBadge(ctx context.Context, id int) (*dto.AttendeeResponseDTO, error)
+	CreateCheckIn(ctx context.Context, id int) error
 }
 
 type AttendeeSvc struct {
@@ -76,4 +77,21 @@ func getCheckInURL(r *http.Request, id string) string {
 	}
 	host := r.Host
 	return fmt.Sprintf("%s://%s/attendees/%s/check-in", scheme, host, id)
+}
+
+func (s *AttendeeSvc) CreateCheckIn(ctx context.Context, id int) error {
+	attendeeCheckIn, err := s.repo.GetCheckIn(ctx, id)
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	if attendeeCheckIn != nil {
+		return httperr.ErrAttendeeAlreadyCheckedIn
+	}
+
+	err = s.repo.CreateCheckIn(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

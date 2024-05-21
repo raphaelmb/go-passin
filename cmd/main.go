@@ -40,6 +40,7 @@ func main() {
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 	mux.HandleFunc("POST /events/{id}/attendees", eventHandler.RegisterForEvent)
 	mux.HandleFunc("GET /attendees/{id}/badge", attendeeHandler.GetAttendeeBadge)
+	mux.HandleFunc("GET /attendees/{id}/check-in", attendeeHandler.CheckIn)
 
 	port := os.Getenv("PORT")
 	slog.Info(fmt.Sprintf("server running on port %s", port))

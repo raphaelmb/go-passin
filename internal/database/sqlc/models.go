@@ -19,6 +19,12 @@ type Attendee struct {
 	EventID   uuid.UUID
 }
 
+type Checkin struct {
+	ID         int32
+	CreatedAt  time.Time
+	AttendeeID int32
+}
+
 type Event struct {
 	ID               uuid.UUID
 	Title            string
