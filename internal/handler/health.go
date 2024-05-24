@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/raphaelmb/go-passin/internal/handler/util"
 )
 
 type IHealth interface {
@@ -13,6 +14,5 @@ func GetHealth(w http.ResponseWriter, r *http.Request) {
 	resp := map[string]string{
 		"status": "ok",
 	}
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	util.JSONResponse(w, http.StatusOK, resp)
 }

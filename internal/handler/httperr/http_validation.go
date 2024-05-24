@@ -8,7 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func ValidateHttpData(d interface{}) *RestErr {
+func ValidateHttpData(d any) *RestErr {
 	val := validator.New(validator.WithRequiredStructEnabled())
 
 	val.RegisterTagNameFunc(func(fld reflect.StructField) string {
@@ -59,7 +59,7 @@ func ValidateHttpData(d interface{}) *RestErr {
 
 			errorsCauses = append(errorsCauses, cause)
 		}
-		return NewBadRequestValidationError("some fields are invalid", errorsCauses)
+		return BadRequestValidationError("some fields are invalid", errorsCauses)
 	}
 	return nil
 }

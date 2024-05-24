@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -19,6 +20,7 @@ func main() {
 	db, err := database.NewDBConnection()
 	if err != nil {
 		slog.Error("error connecting to database", "err", err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
@@ -46,5 +48,6 @@ func main() {
 	slog.Info(fmt.Sprintf("server running on port %s", port))
 	if err := http.ListenAndServe(port, mux); err != nil {
 		slog.Error("error starting server", "err", err)
+		log.Fatal(err)
 	}
 }

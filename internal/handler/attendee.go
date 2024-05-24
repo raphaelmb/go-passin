@@ -2,12 +2,12 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/raphaelmb/go-passin/internal/handler/httperr"
+	"github.com/raphaelmb/go-passin/internal/handler/util"
 	"github.com/raphaelmb/go-passin/internal/service"
 )
 
@@ -30,18 +30,14 @@ func (h *AttendeeHandler) GetAttendeeBadge(w http.ResponseWriter, r *http.Reques
 	stringId := r.PathValue("id")
 	if stringId == "" {
 		slog.Error("id not provided")
-		w.WriteHeader(http.StatusBadRequest)
-		msg := httperr.NewBadRequestError("error to getting event, id not provided")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusBadRequest, httperr.BadRequestError("error to getting event, id not provided"))
 		return
 	}
 
 	id, err := strconv.Atoi(stringId)
 	if err != nil {
 		slog.Error("error converting id string to int")
-		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewInternalServerError("error converting id string to int")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusInternalServerError, httperr.InternalServerError("error converting id string to int"))
 		return
 	}
 
@@ -50,58 +46,44 @@ func (h *AttendeeHandler) GetAttendeeBadge(w http.ResponseWriter, r *http.Reques
 	attendee, err := h.service.GetAttendeeBadge(ctx, id)
 	if err == httperr.ErrAttendeeNotFound {
 		slog.Error("attendee with given id not found")
-		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewBadRequestError(err.Error())
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusInternalServerError, httperr.BadRequestError(err.Error()))
 		return
 	}
 	if err != nil {
 		slog.Error("error converting id string to int")
-		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewInternalServerError("error converting id string to int")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusInternalServerError, httperr.InternalServerError("error converting id string to int"))
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(attendee)
+	util.JSONResponse(w, http.StatusOK, attendee)
 }
 
 func (h *AttendeeHandler) CheckIn(w http.ResponseWriter, r *http.Request) {
 	stringId := r.PathValue("id")
 	if stringId == "" {
 		slog.Error("id not provided")
-		w.WriteHeader(http.StatusBadRequest)
-		msg := httperr.NewBadRequestError("error to getting event, id not provided")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusBadRequest, httperr.BadRequestError("error to getting event, id not provided"))
 		return
 	}
 
 	id, err := strconv.Atoi(stringId)
 	if err != nil {
 		slog.Error("error converting id string to int")
-		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewInternalServerError("error converting id string to int")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusInternalServerError, httperr.InternalServerError("error converting id string to int"))
 		return
 	}
 
 	err = h.service.CreateCheckIn(r.Context(), id)
 	if err == httperr.ErrAttendeeAlreadyCheckedIn {
 		slog.Error("attendee already checked in")
-		w.WriteHeader(http.StatusBadRequest)
-		msg := httperr.NewBadRequestError(err.Error())
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusBadRequest, httperr.BadRequestError(err.Error()))
 		return
 	}
 	if err != nil {
 		slog.Error("error checkin in the attendee")
-		w.WriteHeader(http.StatusInternalServerError)
-		msg := httperr.NewInternalServerError("error checkin in the attendee")
-		json.NewEncoder(w).Encode(msg)
+		util.JSONResponse(w, http.StatusInternalServerError, httperr.InternalServerError("error checkin in the attendee"))
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	util.Response(w, http.StatusCreated)
 }

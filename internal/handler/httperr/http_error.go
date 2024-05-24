@@ -10,9 +10,9 @@ type RestErr struct {
 }
 
 type Fields struct {
-	Field   string      `json:"field"`
-	Value   interface{} `json:"value,omitempty"`
-	Message string      `json:"message"`
+	Field   string `json:"field"`
+	Value   any    `json:"value,omitempty"`
+	Message string `json:"message"`
 }
 
 func (r *RestErr) Error() string {
@@ -28,15 +28,15 @@ func NewRestErr(m, e string, c int, f []Fields) *RestErr {
 	}
 }
 
-func NewBadRequestError(message string) *RestErr {
+func BadRequestError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
-		Err:     "bad_request",
+		Err:     "bad request",
 		Code:    http.StatusBadRequest,
 	}
 }
 
-func NewUnauthorizedRequestError(message string) *RestErr {
+func UnauthorizedRequestError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
 		Err:     "unauthorized",
@@ -44,32 +44,32 @@ func NewUnauthorizedRequestError(message string) *RestErr {
 	}
 }
 
-func NewBadRequestValidationError(m string, c []Fields) *RestErr {
+func BadRequestValidationError(m string, c []Fields) *RestErr {
 	return &RestErr{
 		Message: m,
-		Err:     "bad_request",
+		Err:     "bad request",
 		Code:    http.StatusBadRequest,
 		Fields:  c,
 	}
 }
 
-func NewInternalServerError(message string) *RestErr {
+func InternalServerError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
-		Err:     "internal_server_error",
+		Err:     "internal server error",
 		Code:    http.StatusInternalServerError,
 	}
 }
 
-func NewNotFoundError(message string) *RestErr {
+func NotFoundError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
-		Err:     "not_found",
+		Err:     "not found",
 		Code:    http.StatusNotFound,
 	}
 }
 
-func NewForbiddenError(message string) *RestErr {
+func ForbiddenError(message string) *RestErr {
 	return &RestErr{
 		Message: message,
 		Err:     "forbidden",
