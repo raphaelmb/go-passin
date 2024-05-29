@@ -16,7 +16,7 @@ import (
 type AttendeeService interface {
 	GetAttendeeByEmail(ctx context.Context, email string, eventID uuid.UUID) (*dto.AttendeeResponseDTO, error)
 	CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (*int, error)
-	GetAttendeeBadge(ctx context.Context, id int) (*dto.AttendeeResponseDTO, error)
+	GetAttendeeBadge(ctx context.Context, id int, r *http.Request) (*dto.AttendeeResponseDTO, error)
 	CreateCheckIn(ctx context.Context, id int) error
 }
 
@@ -50,7 +50,7 @@ func (s *AttendeeSvc) CountAttendeesByEvent(ctx context.Context, id uuid.UUID) (
 	return amount, nil
 }
 
-func (s *AttendeeSvc) GetAttendeeBadge(ctx context.Context, id int) (*dto.AttendeeResponseDTO, error) {
+func (s *AttendeeSvc) GetAttendeeBadge(ctx context.Context, id int, r *http.Request) (*dto.AttendeeResponseDTO, error) {
 	attendee, err := s.repo.GetAttendeeBadge(ctx, id)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
@@ -60,7 +60,7 @@ func (s *AttendeeSvc) GetAttendeeBadge(ctx context.Context, id int) (*dto.Attend
 		return nil, httperr.ErrAttendeeNotFound
 	}
 
-	checkInURL := getCheckInURL(ctx.Value("req").(*http.Request), strconv.Itoa(attendee.ID))
+	checkInURL := getCheckInURL(r, strconv.Itoa(attendee.ID))
 
 	return &dto.AttendeeResponseDTO{
 		Name:       attendee.Name,
